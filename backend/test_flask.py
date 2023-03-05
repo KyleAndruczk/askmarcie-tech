@@ -4,11 +4,12 @@ import sqlite3
 from flask_cors import CORS, cross_origin
 import sys
 import openai
-import requests
+# import requests
 import threading
+from secrets import openAIKey
 
 # Set OpenAI API key
-openai.api_key = "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"
+openai.api_key = openAIKey
 
 # Define weights for local and global markets
 local_weight = 2
