@@ -1,0 +1,4 @@
+yelp_dataset.tar
+backend/extracted_files/*
+backend/*.db
+backend/*.json
