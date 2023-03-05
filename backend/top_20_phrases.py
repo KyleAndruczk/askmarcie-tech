@@ -269,12 +269,14 @@
 #____________________________________________________________
 
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 import re
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
+import time
+
 
 def find_common_food_phrases(file_path):
     """
@@ -305,17 +307,22 @@ def find_common_food_phrases(file_path):
     with open(file_path) as f:
          data = [json.loads(line) for line in f]
 
-    data = data[:500]
+    # data = data[:500]
+
+    print("data len " + str(len(data)))
     
     # Define a regular expression to remove non-alphabetic characters from the text
     pattern = re.compile('[^a-zA-Z ]')
-    
+
     # Define a set of stopwords
     stop_words = set(stopwords.words('english'))
-    
+
     # Define a Counter object to count the occurrences of each phrase
     phrase_counter = Counter()
-    
+
+    # Define a dictionary to store the review ratings associated with each phrase
+    phrase_ratings = defaultdict(list)
+
     # Iterate over the objects in the JSON file
     for obj in data:
         # Remove non-alphabetic characters from the text
@@ -334,12 +341,21 @@ def find_common_food_phrases(file_path):
         # Count the occurrences of each phrase that contains at least one food-related word
         for phrase in phrases:
             if any(word in phrase for word in food_related_words):
+                # Add the review rating to the list of ratings associated with the phrase
+                phrase_ratings[phrase].append(obj['stars'])
+                # Increment the count for the phrase
                 phrase_counter[phrase] += 1
-    
+
+    # Calculate the average review rating for each phrase and add it to the phrase_counter
+    for phrase in phrase_counter:
+        if phrase in phrase_ratings:
+            average_rating = sum(phrase_ratings[phrase]) / len(phrase_ratings[phrase])
+            phrase_counter[phrase] = (phrase_counter[phrase], average_rating)
+
     # Return the 10 most common phrases
     return phrase_counter.most_common(100)
 
-
+start_time = time.time()
 
 file_path = 'only_ice_cream_reviews.json'
 common_phrases = find_common_food_phrases(file_path)
@@ -347,10 +363,10 @@ print(common_phrases) # Output: [('new york', 4), ('central park', 3), ('york ci
 
 # list_of_tuples = [('apple', 2), ('banana', 3), ('car', 4), ('cheese', 5), ('milk', 6)]
 
+end_time = time.time()
 
 
-
-
+print("Execution time:", end_time - start_time, "seconds")
 
 food_related_tuples = []
 
@@ -379,6 +395,11 @@ for t in common_phrases:
 print("_________________________________________")
 
 print(food_related_tuples)
+# open the file in write mode
+with open('top_20_phrases.txt', 'w') as f:
+    for item in food_related_tuples:
+        line = str(item) + '\n'
 
+        f.write(line)
 
 
