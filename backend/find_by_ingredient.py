@@ -44,11 +44,20 @@ def find_top_10_ice_cream_shops(ingredient):
     phoenix_businesses = [business for business in phoenix_businesses if business['mentions'][ingredient.lower()] > 0]
     global_businesses = [business for business in global_businesses if business['mentions'][ingredient.lower()] > 0]
 
-    # Sort ice cream shops by the number of times the ingredient is mentioned in their reviews
+    # Count the number of businesses in the local and global markets that use the ingredient
+    local_count = len(phoenix_businesses)
+    global_count = len(global_businesses)
+
+    # Set weights for the local and global markets
+    local_weight = 10
+    global_weight = 1
+
+    # Calculate a weighted count for each business
     ice_cream_shops = []
     for business in phoenix_businesses + global_businesses:
         count = business['mentions'][ingredient.lower()]
-        ice_cream_shops.append((business, count))
+        weighted_count = local_weight * local_count if business in phoenix_businesses else global_weight * global_count
+        ice_cream_shops.append((business, count * weighted_count))
     ice_cream_shops.sort(key=lambda x: x[1], reverse=True)
 
     # Generate a brief description for each of the top 10 ice cream shops using GPT
@@ -59,11 +68,11 @@ def find_top_10_ice_cream_shops(ingredient):
         description = generate_description(business, ingredient)
         descriptions.append((business, description))
     for i, (business, description) in enumerate(descriptions):
-        print(business['name'] + f" ({'Local' if business in phoenix_businesses else 'Global'}) - {description[1]}\n")
+        print(business['name'] + f" - {description[1]}\n")
 
     end = time.time()
     print(f"Execution time: {end - start:.2f} seconds.")
 
 
-top_10 = find_top_10_ice_cream_shops("chocolate")
+find_top_10_ice_cream_shops("pecan")
 
