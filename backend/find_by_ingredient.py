@@ -2,14 +2,15 @@ import openai
 import json
 import time
 from collections import Counter
+from secrets import openAIKey
 
 # Set OpenAI API key
-openai.api_key = "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"
+openai.api_key = openAIKey
 
 def generate_description(business, ingredient):
     prompt = f"Generate a brief description of why {business['name']} is a good match for {ingredient}."
     response = openai.Completion.create(
-        engine="davinci",
+        engine="text-davinci-003",
         prompt=prompt,
         max_tokens=50,
         n=1,
@@ -57,13 +58,12 @@ def find_top_10_ice_cream_shops(ingredient):
         business = ice_cream_shops[i][0]
         description = generate_description(business, ingredient)
         descriptions.append((business, description))
-    # for i, (business, description) in enumerate(descriptions):
-    #     print(f"{i+1}. {business['name']} ({'Local' if business in phoenix_businesses else 'Global'}) - {ice_cream_shops[i][1]} mentions - {description}")
+    for i, (business, description) in enumerate(descriptions):
+        print(business['name'] + f" ({'Local' if business in phoenix_businesses else 'Global'}) - {description[1]}\n")
 
     end = time.time()
     print(f"Execution time: {end - start:.2f} seconds.")
 
 
 top_10 = find_top_10_ice_cream_shops("chocolate")
-for business in top_10:
-    print(business["name"])
+

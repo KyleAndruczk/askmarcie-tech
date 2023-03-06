@@ -307,7 +307,7 @@ def find_common_food_phrases(file_path):
     with open(file_path) as f:
          data = [json.loads(line) for line in f]
 
-    # data = data[:500]
+    # data = data[:15000]
 
     print("data len " + str(len(data)))
     
@@ -396,7 +396,7 @@ print("_________________________________________")
 
 print(food_related_tuples)
 # open the file in write mode
-with open('top_20_phrases.txt', 'w') as f:
+with open('top_20_phrases_full.txt', 'w') as f:
     for item in food_related_tuples:
         line = str(item) + '\n'
 
